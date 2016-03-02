@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          android:versionCode="2"
-          android:versionName="1.0.0-SNAPSHOT"
-          package="com.sfparks">
+    package="com.sfparks"
+    android:versionCode="2"
+    android:versionName="1.0.0-SNAPSHOT">
 
-    <application android:name="com.sfparks.NearbyParksApplication">
-        <activity android:name="com.sfparks.activity.NearbyParksActivity" android:screenOrientation="portrait">
+    <application android:name=".NearbyParksApplication">
+        <activity
+            android:name=".activity.NearbyParksActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
+
 </manifest>
