@@ -11,6 +11,7 @@ import com.sfparks.model.ParksModule;
 public class NearbyParksApplication extends Application {
     static String SF_CITY_API_BASE_URL = "https://data.sfgov.org/resource/";
     private ParksComponent parksComponent;
+    protected static String PARKS_FLAG = "Parks App";
 
     @Override
     public void onCreate() {
