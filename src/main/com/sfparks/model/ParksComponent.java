@@ -11,7 +11,10 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {ParksModule.class, NetworkModule.class})
+@Component(modules = {
+        NetworkModule.class,
+        ParksModule.class})
+
 public interface ParksComponent {
     void inject(NearbyParksActivity activity);
 }

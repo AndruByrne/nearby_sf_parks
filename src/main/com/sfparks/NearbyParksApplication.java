@@ -9,19 +9,20 @@ import com.sfparks.model.ParksModule;
 
 
 public class NearbyParksApplication extends Application {
-    static String SF_CITY_API_BASE_URL = "https://data.sfgov.org/resource/";
+    public static String SF_CITY_API_BASE_URL = "https://data.sfgov.org/resource/";
     private ParksComponent parksComponent;
     protected static String PARKS_FLAG = "Parks App";
 
     @Override
     public void onCreate() {
         super.onCreate();
-
         parksComponent = DaggerParksComponent.builder()
-                .parksModule(new ParksModule())
                 .networkModule(new NetworkModule(SF_CITY_API_BASE_URL))
+                .parksModule(getParksModule())
                 .build();
     }
+
+    public ParksModule getParksModule(){ return new ParksModule(); }
 
     public ParksComponent getParksComponent(){
         return parksComponent;

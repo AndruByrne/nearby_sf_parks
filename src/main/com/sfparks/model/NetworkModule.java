@@ -24,9 +24,7 @@ import rx.Observable;
 public class NetworkModule {
     private String baseUrl;
 
-    public NetworkModule(String baseUrl){
-        this.baseUrl = baseUrl;
-    }
+    public NetworkModule(String baseUrl){ this.baseUrl = baseUrl; }
 
     public interface SFParksInterface{
         @GET("z76i-7s65.json")
@@ -49,9 +47,4 @@ public class NetworkModule {
                 .build();
     }
 
-    @Provides
-    @Singleton
-    SFParksInterface providesSFPI(Retrofit retrofit){
-        return retrofit.create(SFParksInterface.class);
-    }
 }

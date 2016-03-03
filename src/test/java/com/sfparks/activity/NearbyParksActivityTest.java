@@ -1,45 +1,75 @@
 package com.sfparks.activity;
 
+import android.app.Application;
+
 import com.sfparks.BuildConfig;
-import com.squareup.okhttp.mockwebserver.MockResponse;
-import com.squareup.okhttp.mockwebserver.MockWebServer;
+import com.sfparks.NearbyParksApplication;
+import com.sfparks.TestNearbyParksApplication;
+import com.sfparks.model.MockParksModule;
+import com.sfparks.model.NetworkModule;
+import com.sfparks.test_utils.StringConst;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-import static org.junit.Assert.assertThat;
+import java.util.ArrayList;
+
+import io.paperdb.Paper;
+
 import static org.junit.Assert.assertTrue;
 
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21)
+@Config(constants = BuildConfig.class,
+        application = TestNearbyParksApplication.class,
+        sdk = 21)
 public class NearbyParksActivityTest {
 
-    private MockWebServer mockWebServer;
+    @Captor
+    private ArgumentCaptor<ArrayList<Object>> SFAPIcaptor;
 
     @Before
     public void setUp() throws Exception{
-        mockWebServer = new MockWebServer();
-        mockWebServer.start();
+        Application application = RuntimeEnvironment.application;
+        MockParksModule mockParksModule = new MockParksModule();
+        mockParksModule.setResponse(new ArrayList<>(StringConst.SFAPI_LIST)); // unchecked assignment OK
+        ((TestNearbyParksApplication) application).setParksModule(mockParksModule);
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
     public void testOnResumeCallsSFAPI() throws Exception {
-        mockWebServer.enqueue(
-                new MockResponse()
-                        .setResponseCode(200)
-                        .setBody(""));
-        assertTrue(Robolectric.setupActivity(com.sfparks.activity.NearbyParksActivity.class) != null);
-        assertTrue(mockWebServer.getRequestCount() == 1);
+        NearbyParksActivity activity = Robolectric.setupActivity(NearbyParksActivity.class);
+        assertTrue(activity != null);
+/*
+        Robolectric.flushBackgroundThreadScheduler();
+        Robolectric.getBackgroundThreadScheduler().idleConstantly(true);
+        final CountDownLatch latch = new CountDownLatch(1);
+        try{
+            latch.await(100, TimeUnit.MILLISECONDS);
+        }catch (InterruptedException e){
+            latch.notifyAll();
+        }
+        Robolectric.flushForegroundThreadScheduler();
+        Robolectric.getForegroundThreadScheduler().idleConstantly(true);
+*/
+
+        //  RecordedRequest recordedRequest = mockWebServer.takeRequest();
+
+        assertTrue(Paper.book().getAllKeys() == StringConst.SFAPI_LIST);
     }
 
     @After
     public void tearDown() throws Exception {
-        mockWebServer.shutdown();
     }
 }

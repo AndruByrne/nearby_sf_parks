@@ -1,17 +1,13 @@
 package com.sfparks.model;
 
-import android.content.SharedPreferences;
-
-import com.sfparks.model.Park;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import retrofit2.Retrofit;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -30,4 +26,11 @@ public class ParksModule {
         return sfParksInterface.getParks()
                 .subscribeOn(Schedulers.newThread());
     }
+
+    @Provides
+    @Singleton
+    NetworkModule.SFParksInterface providesSFPI(Retrofit retrofit){
+        return retrofit.create(NetworkModule.SFParksInterface.class);
+    }
+
 }

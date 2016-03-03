@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import javax.inject.Inject;
 
+import io.paperdb.Paper;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
@@ -25,16 +26,14 @@ public class NearbyParksActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((NearbyParksApplication) getApplication()).getParksComponent().inject(this);
+        Paper.init(this);
+
         setContentView(R.layout.parks_list_activity);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(
-                "sfparks",
-                "got to onresume"
-                );
         parksObservable
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<ArrayList<Object>>() {
@@ -42,7 +41,7 @@ public class NearbyParksActivity extends Activity {
                     public void call(ArrayList<Object> parks) {
                         Log.d(
                                 "sfparks_onNext",
-                                parks.get(1).toString());
+                                parks.toString());
                     }
                 }, new Action1<Throwable>() {
                     @Override

@@ -7,4 +7,8 @@ package com.sfparks.model;
 public class Park {
     public Park(){}
 
+    private String parkname;
+
+
+
 }
