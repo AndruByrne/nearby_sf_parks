@@ -9,12 +9,12 @@ import com.sfparks.R;
 import com.sfparks.model.Park;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import javax.inject.Inject;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
 
 public class NearbyParksActivity extends Activity {
@@ -51,6 +51,11 @@ public class NearbyParksActivity extends Activity {
                                 "sfparks_onError",
                                 "error in parks observable: ",
                                 throwable);
+                    }
+                }, new Action0() {
+                    @Override
+                    public void call() {
+                        //unsubscribe
                     }
                 });
     }
