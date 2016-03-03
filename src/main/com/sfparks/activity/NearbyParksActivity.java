@@ -20,13 +20,15 @@ import rx.functions.Action1;
 
 public class NearbyParksActivity extends Activity {
 
-    @Inject Observable<ArrayList<Object>> parksObservable;
+    public int track;
+    @Inject Observable<ArrayList<Park>> parksObservable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((NearbyParksApplication) getApplication()).getParksComponent().inject(this);
         Paper.init(this);
+        track = 0;
 
         setContentView(R.layout.parks_list_activity);
     }
@@ -36,9 +38,11 @@ public class NearbyParksActivity extends Activity {
         super.onResume();
         parksObservable
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<ArrayList<Object>>() {
+                .subscribe(new Action1<ArrayList<Park>>() {
                     @Override
-                    public void call(ArrayList<Object> parks) {
+                    public void call(ArrayList<Park> parks) {
+                        track = 1;
+                        System.out.println("sfparks onNext");
                         Log.d(
                                 "sfparks_onNext",
                                 parks.toString());

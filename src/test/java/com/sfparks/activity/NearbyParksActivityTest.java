@@ -23,6 +23,8 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import io.paperdb.Paper;
 
@@ -51,20 +53,21 @@ public class NearbyParksActivityTest {
     public void testOnResumeCallsSFAPI() throws Exception {
         NearbyParksActivity activity = Robolectric.setupActivity(NearbyParksActivity.class);
         assertTrue(activity != null);
-/*
+
         Robolectric.flushBackgroundThreadScheduler();
         Robolectric.getBackgroundThreadScheduler().idleConstantly(true);
         final CountDownLatch latch = new CountDownLatch(1);
         try{
-            latch.await(100, TimeUnit.MILLISECONDS);
+            latch.await(1, TimeUnit.SECONDS);
         }catch (InterruptedException e){
             latch.notifyAll();
         }
         Robolectric.flushForegroundThreadScheduler();
         Robolectric.getForegroundThreadScheduler().idleConstantly(true);
-*/
+
 
         //  RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertTrue(activity.track == 1);
 
         assertTrue(Paper.book().getAllKeys() == StringConst.SFAPI_LIST);
     }

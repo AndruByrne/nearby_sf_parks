@@ -1,5 +1,7 @@
 package com.sfparks.model;
 
+import android.app.Application;
+
 import com.sfparks.activity.NearbyParksActivity;
 
 import javax.inject.Singleton;
@@ -12,6 +14,7 @@ import dagger.Component;
 
 @Singleton
 @Component(modules = {
+        AppModule.class,
         NetworkModule.class,
         ParksModule.class})
 
