@@ -45,7 +45,7 @@ public class LocationModule {
         return new ReactiveLocationProvider(application);
     }
 
-    // Unused
+    // Unused but also not included in the ReactiveLocationProvider; would use a second client for UI
     @Provides
     @Singleton
     Observable<LocationServiceHealth> providesLocationServiceHealth(

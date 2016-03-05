@@ -3,6 +3,7 @@ package com.sfparks.model;
 
 import android.app.Application;
 import android.location.Location;
+import android.support.annotation.NonNull;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -22,6 +23,8 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
+import static java.lang.Math.*;
+
 /*
  * Created by Andrew Brin on 3/1/2016.
  */
@@ -37,16 +40,17 @@ public class ParksModule {
     public static final String EMAIL = "email";
     public static final String NUMBER = "number";
 
-    public ParksModule(){}
+    public ParksModule() {
+    }
 
     @Provides
     @Singleton
-    Observable<List<Park>> providesParksList (
+    Observable<List<Park>> providesParksList(
             final NetworkModule.SFParksInterface sfParksInterface,
             final Application application,
-            final ReactiveLocationProvider reactiveLocationProvider){
+            final ReactiveLocationProvider reactiveLocationProvider) {
         return Observable
-                .range(1,2)
+                .range(1, 2)
                 .switchMap(new Func1<Integer, Observable<? extends ArrayList<String>>>() {
                     @Override
                     public Observable<? extends ArrayList<String>> call(Integer integer) {
@@ -71,33 +75,21 @@ public class ParksModule {
                         return reactiveLocationProvider.getLastKnownLocation()
                                 .switchMap(new Func1<Location, Observable<? extends List<Park>>>() {
                                     @Override
-                                    public Observable<? extends List<Park>> call(Location location) {
+                                    public Observable<? extends List<Park>> call(final Location location) {
                                         final JsonParser jsonParser = new JsonParser();
                                         return Observable.from(strings)
                                                 .map(new Func1<String, String>() {
                                                     @Override
                                                     public String call(String s) {
                                                         return Paper.book().read(s);
-                                                    }})
+                                                    }
+                                                })
                                                 .map(new Func1<String, Park>() {
-                                            @Override
-                                            public Park call(String s) {
-                                                JsonObject object = jsonParser.parse(s).getAsJsonObject();
-                                                JsonObject location = jsonParser.parse(
-                                                        object.get(LOCATION_1)
-                                                                .getAsString()).getAsJsonObject();
-                                                float latitude = location.get(LATITUDE).getAsFloat();
-                                                float longitude = location.get(LONGITUDE).getAsFloat();
-                                                return new Park(
-                                                        1, //placeholder
-                                                        latitude,
-                                                        longitude,
-                                                        object.get(PARKNAME).getAsString(),
-                                                        object.get(PSAMANAGER).getAsString(),
-                                                        object.get(EMAIL).getAsString(),
-                                                        object.get(NUMBER).getAsString());
-                                            }
-                                        }).toSortedList();
+                                                    @Override
+                                                    public Park call(String s) {
+                                                        return getParkFromRecord(s, jsonParser, location);
+                                                    }
+                                                }).toSortedList();
                                     }
                                 });
                     }
@@ -105,9 +97,34 @@ public class ParksModule {
                 .subscribeOn(Schedulers.newThread());
     }
 
+    @NonNull
+    private static Park getParkFromRecord(String s, JsonParser jsonParser, Location current_location) {
+        JsonObject object = jsonParser.parse(s).getAsJsonObject();
+        JsonObject location = jsonParser.parse(
+                object.get(LOCATION_1)
+                        .getAsString()).getAsJsonObject();
+        float latitude = location.get(LATITUDE).getAsFloat();
+        float longitude = location.get(LONGITUDE).getAsFloat();
+        return new Park(
+                // using model described here to find difference:
+                // http://stackoverflow.com/questions/389211/geospatial-coordinates-and-distance-in-kilometers
+                ((Double)((
+                        acos(
+                                sin(latitude * PI / 180) * sin(current_location.getLatitude() * PI / 180)
+                                        + cos(latitude * PI / 180) * cos(current_location.getLatitude() * PI / 180)
+                                        * cos((longitude - current_location.getLongitude()) * PI / 180))
+                                * 180 / PI) * 60 * 1.1515)).intValue(),
+                latitude,
+                longitude,
+                object.get(PARKNAME).getAsString(),
+                object.get(PSAMANAGER).getAsString(),
+                object.get(EMAIL).getAsString(),
+                object.get(NUMBER).getAsString());
+    }
+
     @Provides
     @Singleton
-    NetworkModule.SFParksInterface providesSFPI(Retrofit retrofit){
+    NetworkModule.SFParksInterface providesSFPI(Retrofit retrofit) {
         return retrofit.create(NetworkModule.SFParksInterface.class);
     }
 
