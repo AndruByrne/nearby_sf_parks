@@ -46,6 +46,8 @@ android {
 }
 
 dependencies {
+    // play services
+    compile 'com.google.android.gms:play-services-location:8.4.0'
     // Support v4
     compile 'com.android.support:support-v4:23.2.0'
     // retrofit
@@ -55,6 +57,8 @@ dependencies {
     compile 'com.google.code.gson:gson:2.6.2'
     //rxAndroid
     compile 'io.reactivex:rxandroid:1.1.0'
+    //rxLocation
+    compile 'pl.charmas.android:android-reactive-location:0.8@aar'
     // Because RxAndroid releases are few and far between, it is recommended you also
     // explicitly depend on RxJava's latest version for bug fixes and new features.
     compile 'io.reactivex:rxjava:1.1.0'

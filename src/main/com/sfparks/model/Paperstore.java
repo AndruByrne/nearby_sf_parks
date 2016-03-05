@@ -11,17 +11,19 @@ import rx.Observable;
 
 public class Paperstore {
 
-    static Observable<ArrayList<String>> getParks(){
+    static Observable<ArrayList<String>> getParkKeys(){
         return Observable.just(new ArrayList<>(Paper.book().getAllKeys()));
     }
 
     static public ArrayList<String> updatePaperstore(ArrayList<Object> updates){
-        ArrayList<String> strings = new ArrayList<String>();
-        String holder;
-        for(Object o: updates){
-            holder = o.toString();
-            strings.add(holder);
-            Paper.book().write(holder, 1);
+        ArrayList<String> strings = new ArrayList<>();
+        String holderString;
+        int updatesLength = updates.size();
+        int i;
+        for(i=0; i < updatesLength; i++){
+            holderString = updates.get(i).toString();
+            strings.add(holderString);
+            Paper.book().write(Integer.toString(i), holderString);
         }
         return strings;
     }

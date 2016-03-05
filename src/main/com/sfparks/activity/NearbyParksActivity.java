@@ -9,6 +9,7 @@ import com.sfparks.R;
 import com.sfparks.model.Park;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -21,15 +22,14 @@ import rx.functions.Action1;
 public class NearbyParksActivity extends Activity {
 
     public int track;
-    @Inject Observable<ArrayList<Park>> parksObservable;
+    @Inject Observable<List<Park>> parksObservable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((NearbyParksApplication) getApplication()).getParksComponent().inject(this);
         Paper.init(this);
+        ((NearbyParksApplication) getApplication()).getParksComponent().inject(this);
         track = 0;
-
         setContentView(R.layout.parks_list_activity);
     }
 
@@ -38,9 +38,9 @@ public class NearbyParksActivity extends Activity {
         super.onResume();
         parksObservable
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<ArrayList<Park>>() {
+                .subscribe(new Action1<List<Park>>() {
                     @Override
-                    public void call(ArrayList<Park> parks) {
+                    public void call(List<Park> parks) {
                         track = 1;
                         System.out.println("sfparks onNext");
                         Log.d(
