@@ -4,9 +4,13 @@ package com.sfparks.model;
 import android.app.Application;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +20,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import io.paperdb.Paper;
-import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 import retrofit2.Retrofit;
 import rx.Observable;
 import rx.functions.Action1;
@@ -39,6 +42,7 @@ public class ParksModule {
     public static final String LONGITUDE = "longitude";
     public static final String EMAIL = "email";
     public static final String NUMBER = "number";
+    public static final String DUMMY_PARKNAME = "ParkName";
 
     public ParksModule() {
     }
@@ -48,7 +52,7 @@ public class ParksModule {
     Observable<List<Park>> providesParksList(
             final NetworkModule.SFParksInterface sfParksInterface,
             final Application application,
-            final ReactiveLocationProvider reactiveLocationProvider) {
+            final Observable<LatLng> reactiveLocationProvider) {
         return Observable
                 .range(1, 2)
                 .switchMap(new Func1<Integer, Observable<? extends ArrayList<String>>>() {
@@ -63,6 +67,7 @@ public class ParksModule {
                                         @Override
                                         public Observable<? extends ArrayList<String>> call(ArrayList<Object> objects) {
                                             Paperstore.updatePaperstore(objects);
+                                            Log.d("sfparks_parks_module", "updated paperstore");
                                             return Paperstore.getParkKeys();
                                         }
                                     });
@@ -72,10 +77,11 @@ public class ParksModule {
                 .switchMap(new Func1<ArrayList<String>, Observable<? extends List<Park>>>() {
                     @Override
                     public Observable<? extends List<Park>> call(final ArrayList<String> strings) {
-                        return reactiveLocationProvider.getLastKnownLocation()
-                                .switchMap(new Func1<Location, Observable<? extends List<Park>>>() {
+                        return reactiveLocationProvider
+                                .switchMap(new Func1<LatLng, Observable<? extends List<Park>>>() {
                                     @Override
-                                    public Observable<? extends List<Park>> call(final Location location) {
+                                    public Observable<? extends List<Park>> call(final LatLng latLng) {
+                                        Log.d("sfparks parksModule", "got last known location");
                                         final JsonParser jsonParser = new JsonParser();
                                         return Observable.from(strings)
                                                 .map(new Func1<String, String>() {
@@ -84,12 +90,53 @@ public class ParksModule {
                                                         return Paper.book().read(s);
                                                     }
                                                 })
-                                                .map(new Func1<String, Park>() {
+                                                .filter(new Func1<String, Boolean>() {
                                                     @Override
-                                                    public Park call(String s) {
-                                                        return getParkFromRecord(s, jsonParser, location);
+                                                    public Boolean call(String s) {
+                                                        return (s != null);
                                                     }
-                                                }).toSortedList();
+                                                })
+                                                .map(new Func1<String, JsonObject>() {
+                                                    @Override
+                                                    public JsonObject call(String s) {
+                                                        Log.d("sfparks parksModule", "about to parse 1");
+                                                        try {
+                                                            return jsonParser.parse(s.trim()).getAsJsonObject();
+                                                        } catch (JsonSyntaxException e ){
+                                                            Log.d("sfparks parksModule", "poorly formed json: "+s+" Error: "+e);
+                                                            return null;
+                                                        }
+                                                    }
+                                                })
+                                                .filter(new Func1<JsonObject, Boolean>() {
+                                                    @Override
+                                                    public Boolean call(JsonObject jsonObject) {
+                                                        Log.d("sfparks parksModule", "about to filter 1");
+                                                        // its malforming up here in the filters
+                                                        return !(jsonObject == null || jsonObject.get(LOCATION_1) == null);
+                                                    }
+                                                })
+                                                .filter(new Func1<JsonObject, Boolean>() {
+                                                    @Override
+                                                    public Boolean call(JsonObject jsonObject) {
+                                                        Log.d("sfparks parksModule", "about to filter 2");
+                                                        JsonElement jsonElement = jsonParser.parse(jsonObject.get(LOCATION_1).getAsString()).getAsJsonObject().get(LATITUDE);
+                                                        return !(jsonElement == null || jsonElement.getAsString().equals("999"));
+                                                    }
+                                                })
+                                                .map(new Func1<JsonObject, Park>() {
+                                                    @Override
+                                                    public Park call(JsonObject object) {
+                                                        Log.d("sfparks parksModule", "getting park from record");
+                                                        return getParkFromRecord(object, jsonParser, latLng);
+                                                    }
+                                                })
+                                                .toSortedList().doOnNext(new Action1<List<Park>>() {
+                                                    @Override
+                                                    public void call(List<Park> parks) {
+                                                        Log.d("sfparks parksModule", "got sortedlist: " + parks.toString());
+                                                    }
+                                                });
                                     }
                                 });
                     }
@@ -98,8 +145,7 @@ public class ParksModule {
     }
 
     @NonNull
-    private static Park getParkFromRecord(String s, JsonParser jsonParser, Location current_location) {
-        JsonObject object = jsonParser.parse(s).getAsJsonObject();
+    private static Park getParkFromRecord(JsonObject object, JsonParser jsonParser, LatLng currentLatLng) {
         JsonObject location = jsonParser.parse(
                 object.get(LOCATION_1)
                         .getAsString()).getAsJsonObject();
@@ -108,12 +154,15 @@ public class ParksModule {
         return new Park(
                 // using model described here to find difference:
                 // http://stackoverflow.com/questions/389211/geospatial-coordinates-and-distance-in-kilometers
-                ((Double)((
+                ((Double) ((
                         acos(
-                                sin(latitude * PI / 180) * sin(current_location.getLatitude() * PI / 180)
-                                        + cos(latitude * PI / 180) * cos(current_location.getLatitude() * PI / 180)
-                                        * cos((longitude - current_location.getLongitude()) * PI / 180))
-                                * 180 / PI) * 60 * 1.1515)).intValue(),
+                                sin(latitude * PI / 180) * sin(currentLatLng.latitude * PI / 180)
+                                        + cos(latitude * PI / 180) * cos(currentLatLng.latitude * PI / 180)
+                                        * cos((longitude - currentLatLng.longitude) * PI / 180))
+                                * 180 / PI) * 60 * 1.1515
+                        // get decameter to avoid collision through int rounding
+                        // TODO: add decameter -> kilometer conversion in UI
+                        * 100)).intValue(),
                 latitude,
                 longitude,
                 object.get(PARKNAME).getAsString(),

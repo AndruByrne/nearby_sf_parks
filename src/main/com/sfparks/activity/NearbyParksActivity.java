@@ -21,7 +21,6 @@ import rx.functions.Action1;
 
 public class NearbyParksActivity extends Activity {
 
-    public int track;
     @Inject Observable<List<Park>> parksObservable;
 
     @Override
@@ -29,19 +28,18 @@ public class NearbyParksActivity extends Activity {
         super.onCreate(savedInstanceState);
         Paper.init(this);
         ((NearbyParksApplication) getApplication()).getParksComponent().inject(this);
-        track = 0;
         setContentView(R.layout.parks_list_activity);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d("sfparks_onResume", "test_logging");
         parksObservable
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<Park>>() {
                     @Override
                     public void call(List<Park> parks) {
-                        track = 1;
                         System.out.println("sfparks onNext");
                         Log.d(
                                 "sfparks_onNext",
@@ -52,8 +50,7 @@ public class NearbyParksActivity extends Activity {
                     public void call(Throwable throwable) {
                         Log.e(
                                 "sfparks_onError",
-                                "error in parks observable: ",
-                                throwable);
+                                "error in parks observable: " + throwable);
                     }
                 }, new Action0() {
                     @Override

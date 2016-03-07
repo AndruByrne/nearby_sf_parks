@@ -67,7 +67,6 @@ public class NearbyParksActivityTest {
 
 
         //  RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertTrue(activity.track == 1);
 
         assertTrue(Paper.book().getAllKeys() == StringConst.SFAPI_LIST);
     }
