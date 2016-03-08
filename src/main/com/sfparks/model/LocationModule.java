@@ -98,7 +98,7 @@ public class LocationModule {
                 });
     }
 
-    // Unused but also not included in the ReactiveLocationProvider; would use a second client for UI
+    // Unused; would use a second client for UI connection feedback (prompt to enable location sharing)
     @Provides
     @Singleton
     Observable<LocationServiceHealth> providesLocationServiceHealth(

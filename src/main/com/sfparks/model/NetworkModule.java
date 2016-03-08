@@ -2,6 +2,7 @@ package com.sfparks.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
@@ -28,7 +29,7 @@ public class NetworkModule {
 
     public interface SFParksInterface{
         @GET("z76i-7s65.json")
-        Observable<ArrayList<Object>> getParks();
+        Observable<ArrayList<JsonObject>> getParks();
     }
 
     @Provides

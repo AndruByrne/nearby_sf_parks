@@ -63,11 +63,10 @@ public class ParksModule {
                             Paper.book().destroy();
                             Paper.init(application);
                             return sfParksInterface.getParks()
-                                    .switchMap(new Func1<ArrayList<Object>, Observable<? extends ArrayList<String>>>() {
+                                    .switchMap(new Func1<ArrayList<JsonObject>, Observable<? extends ArrayList<String>>>() {
                                         @Override
-                                        public Observable<? extends ArrayList<String>> call(ArrayList<Object> objects) {
+                                        public Observable<? extends ArrayList<String>> call(ArrayList<JsonObject> objects) {
                                             Paperstore.updatePaperstore(objects);
-                                            Log.d("sfparks_parks_module", "updated paperstore");
                                             return Paperstore.getParkKeys();
                                         }
                                     });
@@ -99,7 +98,6 @@ public class ParksModule {
                                                 .map(new Func1<String, JsonObject>() {
                                                     @Override
                                                     public JsonObject call(String s) {
-                                                        Log.d("sfparks parksModule", "about to parse 1");
                                                         try {
                                                             return jsonParser.parse(s.trim()).getAsJsonObject();
                                                         } catch (JsonSyntaxException e ){
@@ -111,7 +109,6 @@ public class ParksModule {
                                                 .filter(new Func1<JsonObject, Boolean>() {
                                                     @Override
                                                     public Boolean call(JsonObject jsonObject) {
-                                                        Log.d("sfparks parksModule", "about to filter 1");
                                                         // its malforming up here in the filters
                                                         return !(jsonObject == null || jsonObject.get(LOCATION_1) == null);
                                                     }
@@ -119,24 +116,17 @@ public class ParksModule {
                                                 .filter(new Func1<JsonObject, Boolean>() {
                                                     @Override
                                                     public Boolean call(JsonObject jsonObject) {
-                                                        Log.d("sfparks parksModule", "about to filter 2");
-                                                        JsonElement jsonElement = jsonParser.parse(jsonObject.get(LOCATION_1).getAsString()).getAsJsonObject().get(LATITUDE);
+                                                        JsonElement jsonElement = jsonObject.get(LOCATION_1).getAsJsonObject().get(LATITUDE);
                                                         return !(jsonElement == null || jsonElement.getAsString().equals("999"));
                                                     }
                                                 })
                                                 .map(new Func1<JsonObject, Park>() {
                                                     @Override
                                                     public Park call(JsonObject object) {
-                                                        Log.d("sfparks parksModule", "getting park from record");
                                                         return getParkFromRecord(object, jsonParser, latLng);
                                                     }
                                                 })
-                                                .toSortedList().doOnNext(new Action1<List<Park>>() {
-                                                    @Override
-                                                    public void call(List<Park> parks) {
-                                                        Log.d("sfparks parksModule", "got sortedlist: " + parks.toString());
-                                                    }
-                                                });
+                                                .toSortedList();
                                     }
                                 });
                     }
@@ -146,9 +136,7 @@ public class ParksModule {
 
     @NonNull
     private static Park getParkFromRecord(JsonObject object, JsonParser jsonParser, LatLng currentLatLng) {
-        JsonObject location = jsonParser.parse(
-                object.get(LOCATION_1)
-                        .getAsString()).getAsJsonObject();
+        JsonObject location = object.get(LOCATION_1).getAsJsonObject();
         float latitude = location.get(LATITUDE).getAsFloat();
         float longitude = location.get(LONGITUDE).getAsFloat();
         return new Park(

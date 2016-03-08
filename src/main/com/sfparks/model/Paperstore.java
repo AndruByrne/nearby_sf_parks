@@ -4,6 +4,8 @@ package com.sfparks.model;
  * Created by Andrew Brin on 3/3/2016.
  */
 
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
 
 import io.paperdb.Paper;
@@ -15,13 +17,13 @@ public class Paperstore {
         return Observable.just(new ArrayList<>(Paper.book().getAllKeys()));
     }
 
-    static public ArrayList<String> updatePaperstore(ArrayList<Object> updates){
+    static public ArrayList<String> updatePaperstore(ArrayList<JsonObject> updates){
         ArrayList<String> strings = new ArrayList<>();
         String holderString;
         int updatesLength = updates.size();
         int i;
         for(i=0; i < updatesLength; i++){
-            holderString = updates.get(i).toString();
+            holderString = updates.get(i).getAsJsonObject().toString();
             strings.add(holderString);
             Paper.book().write(Integer.toString(i), holderString);
         }
