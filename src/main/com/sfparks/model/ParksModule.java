@@ -53,6 +53,7 @@ public class ParksModule {
             final NetworkModule.SFParksInterface sfParksInterface,
             final Application application,
             final Observable<LatLng> reactiveLocationProvider) {
+        Paper.init(application);
         return Observable
                 .range(1, 2)
                 .switchMap(new Func1<Integer, Observable<? extends ArrayList<String>>>() {
@@ -80,7 +81,6 @@ public class ParksModule {
                                 .switchMap(new Func1<LatLng, Observable<? extends List<Park>>>() {
                                     @Override
                                     public Observable<? extends List<Park>> call(final LatLng latLng) {
-                                        Log.d("sfparks parksModule", "got last known location");
                                         final JsonParser jsonParser = new JsonParser();
                                         return Observable.from(strings)
                                                 .map(new Func1<String, String>() {
@@ -100,8 +100,8 @@ public class ParksModule {
                                                     public JsonObject call(String s) {
                                                         try {
                                                             return jsonParser.parse(s.trim()).getAsJsonObject();
-                                                        } catch (JsonSyntaxException e ){
-                                                            Log.d("sfparks parksModule", "poorly formed json: "+s+" Error: "+e);
+                                                        } catch (JsonSyntaxException e) {
+                                                            Log.d("sfparks parksModule", "poorly formed json: " + s + " Error: " + e);
                                                             return null;
                                                         }
                                                     }

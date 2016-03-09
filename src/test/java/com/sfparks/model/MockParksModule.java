@@ -20,8 +20,9 @@ public class MockParksModule extends ParksModule{
 
     @Override
     NetworkModule.SFParksInterface providesSFPI(Retrofit retrofit) {
-        NetworkModule.SFParksInterface mock = Mockito.mock(NetworkModule.SFParksInterface.class);
-        Mockito.when(mock.getParks()).thenReturn(Observable.just(response));
-        return mock;
+//        NetworkModule.SFParksInterface mock = Mockito.mock(NetworkModule.SFParksInterface.class);
+//        Mockito.when(mock.getParks()).thenReturn(Observable.just(response));
+//        return mock;
+        return null;
     }
 }

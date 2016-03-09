@@ -5,6 +5,15 @@ package com.sfparks.model;
  */
 
 public class Park implements Comparable<Park>{
+
+    public final int distance;
+    public final float latitude;
+    public final float longitude;
+    public final String parkname;
+    public final String managerName;
+    public final String email;
+    public final String phoneNumber;
+
     public Park(int distance, float latitude, float longitude, String parkname, String managerName, String email, String phoneNumber){
         this.distance = distance;
         this.latitude = latitude;
@@ -14,14 +23,6 @@ public class Park implements Comparable<Park>{
         this.email = email;
         this.phoneNumber = phoneNumber;
     }
-
-    private int distance;
-    private float latitude;
-    private float longitude;
-    private String parkname;
-    private String managerName;
-    private String email;
-    private String phoneNumber;
 
     @Override
     public int compareTo(Park another) {
