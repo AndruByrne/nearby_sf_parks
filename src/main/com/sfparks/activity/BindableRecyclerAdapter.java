@@ -1,10 +1,12 @@
 package com.sfparks.activity;
 
+import android.app.Application;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 import android.databinding.ViewDataBinding;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,27 +19,26 @@ import com.sfparks.model.Park;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 /*
  * Created by Andrew Brin on 3/8/2016.
  */
 public class BindableRecyclerAdapter extends RecyclerView.Adapter<BindableRecyclerAdapter.BindingHolder> {
 
+    @Inject Application application;
     private List<Park> parks;
+    private static ObservableList.OnListChangedCallback onListChangedCallback;
 
     public BindableRecyclerAdapter(ObservableArrayList<Park> parks){ this.parks = parks; }
 
     @BindingAdapter({"entries"})
     public static void setEntries(RecyclerView view, final ObservableArrayList<Park> parks){
-        if(parks.size() != 0){
-            throw new RuntimeException();
-        }
-        Log.d("sfparks adapter", "setting parks");
         final BindableRecyclerAdapter adapter = new BindableRecyclerAdapter(parks);
-        Log.d("sfparks adapter", "created the adapter");
-        parks.addOnListChangedCallback(new ObservableList.OnListChangedCallback() {
+        // making field to avoid gc
+        onListChangedCallback = new ObservableList.OnListChangedCallback() {
             @Override
             public void onChanged(ObservableList sender) {
-                Log.d("sfparks adapter", "dataset has changed");
                 adapter.notifyDataSetChanged();
             }
 
@@ -49,7 +50,6 @@ public class BindableRecyclerAdapter extends RecyclerView.Adapter<BindableRecycl
             @Override
             public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
                 adapter.notifyItemRangeInserted(positionStart, itemCount);
-
             }
 
             @Override
@@ -63,9 +63,9 @@ public class BindableRecyclerAdapter extends RecyclerView.Adapter<BindableRecycl
                 adapter.notifyItemRangeRemoved(positionStart, itemCount);
 
             }
-        });
+        };
+        parks.addOnListChangedCallback(onListChangedCallback);
         view.setAdapter(adapter);
-        Log.d("sfparks adapter", "set the adapter");
     }
 
     public static class BindingHolder extends RecyclerView.ViewHolder {

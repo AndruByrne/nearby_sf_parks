@@ -142,21 +142,29 @@ public class ParksModule {
         return new Park(
                 // using model described here to find difference:
                 // http://stackoverflow.com/questions/389211/geospatial-coordinates-and-distance-in-kilometers
-                ((Double) ((
-                        acos(
-                                sin(latitude * PI / 180) * sin(currentLatLng.latitude * PI / 180)
-                                        + cos(latitude * PI / 180) * cos(currentLatLng.latitude * PI / 180)
-                                        * cos((longitude - currentLatLng.longitude) * PI / 180))
-                                * 180 / PI) * 60 * 1.1515
-                        // get decameter to avoid collision through int rounding
-                        // TODO: add decameter -> kilometer conversion in UI
-                        * 100)).intValue(),
+                getDistance(currentLatLng, latitude, longitude),
                 latitude,
                 longitude,
                 object.get(PARKNAME).getAsString(),
                 object.get(PSAMANAGER).getAsString(),
                 object.get(EMAIL).getAsString(),
                 object.get(NUMBER).getAsString());
+    }
+
+    private static int getDistance(LatLng currentLatLng, float latitude, float longitude) {
+        if (currentLatLng == null) {
+            Log.w("sfparks parkModule","current location is null!");
+            return 0; // user may not have location turned on?
+        }
+        return ((Double) ((
+                acos(
+                        sin(latitude * PI / 180) * sin(currentLatLng.latitude * PI / 180)
+                                + cos(latitude * PI / 180) * cos(currentLatLng.latitude * PI / 180)
+                                * cos((longitude - currentLatLng.longitude) * PI / 180))
+                        * 180 / PI) * 60 * 1.1515
+                // get decameter to avoid collision through int rounding
+                // TODO: add decameter -> kilometer conversion in UI
+                * 100)).intValue();
     }
 
     @Provides

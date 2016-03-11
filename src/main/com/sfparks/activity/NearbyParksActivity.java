@@ -33,8 +33,8 @@ public class NearbyParksActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ParksListActivityBinding parksActivityBinding = ParksListActivityBinding.inflate(getLayoutInflater());
-        parksActivityBinding.setVariable(BR.park_list, observableArrayList);
+        ParksListActivityBinding parksListActivityBinding = DataBindingUtil.setContentView(this, R.layout.parks_list_activity);
+        parksListActivityBinding.setVariable(BR.park_list, observableArrayList);
         ((NearbyParksApplication) getApplication()).getParksComponent().inject(this);
     }
 
@@ -49,8 +49,8 @@ public class NearbyParksActivity extends Activity {
                     public void call(List<Park> parks) {
                         if(parks.size() != 0){
                             Log.d(
-                                "sfparks onNext: ",
-                                Integer.toString(parks.size()));
+                                    "sfparks onNext: ",
+                                    Integer.toString(parks.size()));
                             observableArrayList.addAll(parks);
                         } else Log.i("com.sfparks", "empty parks list not displayed");
                     }
