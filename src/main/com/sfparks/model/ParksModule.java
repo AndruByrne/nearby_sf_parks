@@ -163,7 +163,6 @@ public class ParksModule {
                                 * cos((longitude - currentLatLng.longitude) * PI / 180))
                         * 180 / PI) * 60 * 1.1515
                 // get decameter to avoid collision through int rounding
-                // TODO: add decameter -> kilometer conversion in UI
                 * 100)).intValue();
     }
 
