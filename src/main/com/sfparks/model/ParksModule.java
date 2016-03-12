@@ -21,6 +21,7 @@ import dagger.Module;
 import dagger.Provides;
 import io.paperdb.Paper;
 import retrofit2.Retrofit;
+import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -63,11 +64,17 @@ public class ParksModule {
                         else {
                             Paper.book().destroy();
                             Paper.init(application);
-                            return sfParksInterface.getParks()
+                            return sfParksInterface
+                                    .getParks()
+                                    .doOnNext(new Action1<ArrayList<JsonObject>>() {
+                                        @Override
+                                        public void call(ArrayList<JsonObject> jsonObjects) {
+                                            Paperstore.updatePaperstore(jsonObjects);
+                                        }
+                                    })
                                     .switchMap(new Func1<ArrayList<JsonObject>, Observable<? extends ArrayList<String>>>() {
                                         @Override
                                         public Observable<? extends ArrayList<String>> call(ArrayList<JsonObject> objects) {
-                                            Paperstore.updatePaperstore(objects);
                                             return Paperstore.getParkKeys();
                                         }
                                     });
@@ -152,9 +159,9 @@ public class ParksModule {
     }
 
     private static int getDistance(LatLng currentLatLng, float latitude, float longitude) {
-        if (currentLatLng == null) {
+        if (Math.round(currentLatLng.latitude) == 90) {
             Log.w("sfparks parkModule","current location is null!");
-            return 0; // user may not have location turned on?
+            return 0; // user may not have location turned on, or is at the north pole
         }
         return ((Double) ((
                 acos(
