@@ -1,8 +1,7 @@
-package com.sfparks.model;
+package com.sfparks.modules;
 
 
 import android.app.Application;
-import android.location.Location;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -11,6 +10,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import com.sfparks.model.ParksStore;
+import com.sfparks.model.Park;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +20,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import io.paperdb.Paper;
 import retrofit2.Retrofit;
-import rx.Notification;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -54,28 +53,30 @@ public class ParksModule {
             final NetworkModule.SFParksInterface sfParksInterface,
             final Application application,
             final Observable<LatLng> reactiveLocationProvider) {
-        Paper.init(application);
         return Observable
                 .range(1, 2)
                 .switchMap(new Func1<Integer, Observable<? extends ArrayList<String>>>() {
                     @Override
                     public Observable<? extends ArrayList<String>> call(Integer integer) {
-                        if (integer == 1) return Paperstore.getParkKeys();
+                        if (integer == 1) {
+                            ParksStore.initialize(application);
+                            return ParksStore.getParkKeys();
+                        }
                         else {
-                            Paper.book().destroy();
-                            Paper.init(application);
+                            ParksStore.nuke(application);
+                            ParksStore.initialize(application);
                             return sfParksInterface
                                     .getParks()
                                     .doOnNext(new Action1<ArrayList<JsonObject>>() {
                                         @Override
                                         public void call(ArrayList<JsonObject> jsonObjects) {
-                                            Paperstore.updatePaperstore(jsonObjects);
+                                            ParksStore.updatePaperstore(jsonObjects);
                                         }
                                     })
                                     .switchMap(new Func1<ArrayList<JsonObject>, Observable<? extends ArrayList<String>>>() {
                                         @Override
                                         public Observable<? extends ArrayList<String>> call(ArrayList<JsonObject> objects) {
-                                            return Paperstore.getParkKeys();
+                                            return ParksStore.getParkKeys();
                                         }
                                     });
                         }
@@ -93,7 +94,7 @@ public class ParksModule {
                                                 .map(new Func1<String, String>() {
                                                     @Override
                                                     public String call(String s) {
-                                                        return Paper.book().read(s);
+                                                        return ParksStore.getPark(s);
                                                     }
                                                 })
                                                 .filter(new Func1<String, Boolean>() {
@@ -172,11 +173,4 @@ public class ParksModule {
                 // get decameter to avoid collision through int rounding
                 * 100)).intValue();
     }
-
-    @Provides
-    @Singleton
-    NetworkModule.SFParksInterface providesSFPI(Retrofit retrofit) {
-        return retrofit.create(NetworkModule.SFParksInterface.class);
-    }
-
 }

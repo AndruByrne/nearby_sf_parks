@@ -1,4 +1,4 @@
-package com.sfparks.model;
+package com.sfparks.modules;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -48,4 +48,9 @@ public class NetworkModule {
                 .build();
     }
 
+    @Provides
+    @Singleton
+    NetworkModule.SFParksInterface providesSFPI(Retrofit retrofit) {
+        return retrofit.create(NetworkModule.SFParksInterface.class);
+    }
 }

@@ -51,7 +51,7 @@ public class NearbyParksActivity extends Activity {
                             Log.d(
                                     "sfparks onNext: ",
                                     Integer.toString(parks.size()));
-                            observableArrayList.addAll(parks);
+                            if (observableArrayList.size() == 0) observableArrayList.addAll(parks);
                         } else Log.i("com.sfparks", "empty parks list not displayed");
                     }
                 }, new Action1<Throwable>() {

@@ -1,16 +1,16 @@
 package com.sfparks.model;
 
-import org.mockito.Mockito;
+import com.sfparks.modules.NetworkModule;
+import com.sfparks.modules.ParksModule;
 
 import java.util.ArrayList;
 
 import retrofit2.Retrofit;
-import rx.Observable;
 
 /*
  * Created by Andrew Brin on 3/2/2016.
  */
-public class MockParksModule extends ParksModule{
+public class MockParksModule extends ParksModule {
 
     public void setResponse(ArrayList<Object> response) {
         this.response = response;
@@ -18,7 +18,7 @@ public class MockParksModule extends ParksModule{
 
     ArrayList<Object> response;
 
-    @Override
+//    @Override
     NetworkModule.SFParksInterface providesSFPI(Retrofit retrofit) {
 //        NetworkModule.SFParksInterface mock = Mockito.mock(NetworkModule.SFParksInterface.class);
 //        Mockito.when(mock.getParks()).thenReturn(Observable.just(response));

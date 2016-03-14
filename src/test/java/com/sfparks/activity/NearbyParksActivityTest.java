@@ -3,10 +3,8 @@ package com.sfparks.activity;
 import android.app.Application;
 
 import com.sfparks.BuildConfig;
-import com.sfparks.NearbyParksApplication;
 import com.sfparks.TestNearbyParksApplication;
 import com.sfparks.model.MockParksModule;
-import com.sfparks.model.NetworkModule;
 import com.sfparks.test_utils.StringConst;
 
 import org.junit.After;
@@ -15,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;

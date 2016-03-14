@@ -2,14 +2,12 @@ package com.sfparks;
 
 import android.app.Application;
 
-import com.sfparks.model.AppModule;
-import com.sfparks.model.DaggerParksComponent;
-import com.sfparks.model.LocationModule;
-import com.sfparks.model.NetworkModule;
-import com.sfparks.model.ParksComponent;
-import com.sfparks.model.ParksModule;
-
-import io.paperdb.Paper;
+import com.sfparks.modules.AppModule;
+import com.sfparks.modules.DaggerParksComponent;
+import com.sfparks.modules.LocationModule;
+import com.sfparks.modules.NetworkModule;
+import com.sfparks.modules.ParksComponent;
+import com.sfparks.modules.ParksModule;
 
 
 public class NearbyParksApplication extends Application {

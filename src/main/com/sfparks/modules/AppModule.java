@@ -1,4 +1,4 @@
-package com.sfparks.model;
+package com.sfparks.modules;
 
 /*
  * Created by Andrew Brin on 3/3/2016.

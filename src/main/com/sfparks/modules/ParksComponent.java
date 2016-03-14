@@ -1,6 +1,4 @@
-package com.sfparks.model;
-
-import android.app.Application;
+package com.sfparks.modules;
 
 import com.sfparks.activity.NearbyParksActivity;
 

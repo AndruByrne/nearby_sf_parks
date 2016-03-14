@@ -4,9 +4,8 @@ package com.sfparks;
  * Created by Andrew Brin on 3/2/2016.
  */
 
-import com.sfparks.NearbyParksApplication;
 import com.sfparks.model.MockParksModule;
-import com.sfparks.model.ParksModule;
+import com.sfparks.modules.ParksModule;
 
 public class TestNearbyParksApplication extends NearbyParksApplication {
 

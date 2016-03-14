@@ -4,6 +4,7 @@ package com.sfparks.model;
  * Created by Andrew Brin on 3/3/2016.
  */
 
+import android.app.Application;
 import android.util.Log;
 
 import com.google.gson.JsonObject;
@@ -14,9 +15,9 @@ import io.paperdb.Book;
 import io.paperdb.Paper;
 import rx.Observable;
 
-public class Paperstore {
+public class ParksStore {
 
-    static Observable<ArrayList<String>> getParkKeys(){
+    static public Observable<ArrayList<String>> getParkKeys(){
         return Observable.just(new ArrayList<>(Paper.book().getAllKeys()));
     }
 
@@ -28,5 +29,17 @@ public class Paperstore {
             holderString = updates.get(i).getAsJsonObject().toString();
             Paper.book().write(Integer.toString(i), holderString);
         }
+    }
+
+    public static void nuke(Application application) {
+        Paper.book().destroy();
+    }
+
+    public static String getPark(String s) {
+        return Paper.book().read(s);
+    }
+
+    public static void initialize(Application application) {
+        Paper.init(application);
     }
 }
