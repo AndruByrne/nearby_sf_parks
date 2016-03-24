@@ -5,28 +5,26 @@ package com.sfparks.model;
  */
 
 import android.app.Application;
-import android.util.Log;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 
 import java.util.ArrayList;
 
-import io.paperdb.Book;
 import io.paperdb.Paper;
 import rx.Observable;
 
 public class ParksStore {
 
-    static public Observable<ArrayList<String>> getParkKeys(){
+    static public Observable<ArrayList<String>> getParkKeys() {
         return Observable.just(new ArrayList<>(Paper.book().getAllKeys()));
     }
 
-    static public void updatePaperstore(ArrayList<JsonObject> updates){
+    static public void updatePaperstore(JsonArray updates) {
         String holderString;
         int updatesLength = updates.size();
         int i;
-        for(i=0; i < updatesLength; i++){
-            holderString = updates.get(i).getAsJsonObject().toString();
+        for (i = 0; i < updatesLength; i++) {
+            holderString = updates.get(i).toString();
             Paper.book().write(Integer.toString(i), holderString);
         }
     }

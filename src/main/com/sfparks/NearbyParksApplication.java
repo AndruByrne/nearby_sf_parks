@@ -1,6 +1,7 @@
 package com.sfparks;
 
 import android.app.Application;
+import android.support.annotation.NonNull;
 
 import com.sfparks.modules.AppModule;
 import com.sfparks.modules.DaggerParksComponent;
@@ -8,6 +9,7 @@ import com.sfparks.modules.LocationModule;
 import com.sfparks.modules.NetworkModule;
 import com.sfparks.modules.ParksComponent;
 import com.sfparks.modules.ParksModule;
+import com.sfparks.modules.ThreadingModule;
 
 
 public class NearbyParksApplication extends Application {
@@ -20,13 +22,22 @@ public class NearbyParksApplication extends Application {
         super.onCreate();
         parksComponent = DaggerParksComponent.builder()
                 .appModule(new AppModule(this))
-                .networkModule(new NetworkModule(SF_CITY_API_BASE_URL))
-                .parksModule(getParksModule())
-                .locationModule(new LocationModule())
+                .networkModule(getNetworkModule(SF_CITY_API_BASE_URL))
+                .locationModule(getLocationModule())
+                .parksModule(new ParksModule())
+                .threadingModule(getThreadingModule())
                 .build();
     }
 
-    public ParksModule getParksModule(){ return new ParksModule(); }
+    public LocationModule getLocationModule() {
+        return new LocationModule();
+    }
+
+    public NetworkModule getNetworkModule(String sfCityApiBaseUrl) {
+        return new NetworkModule(sfCityApiBaseUrl);
+    }
+
+    public ThreadingModule getThreadingModule(){ return new ThreadingModule(); }
 
     public ParksComponent getParksComponent(){
         return parksComponent;

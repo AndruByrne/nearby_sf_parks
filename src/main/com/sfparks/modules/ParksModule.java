@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -20,11 +21,10 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import retrofit2.Retrofit;
 import rx.Observable;
+import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 import static java.lang.Math.*;
 
@@ -52,34 +52,46 @@ public class ParksModule {
     Observable<List<Park>> providesParksList(
             final NetworkModule.SFParksInterface sfParksInterface,
             final Application application,
+            final Scheduler backgroundScheduler,
             final Observable<LatLng> reactiveLocationProvider) {
         return Observable
                 .range(1, 2)
+                .doOnNext(new Action1<Integer>() {
+                    @Override
+                    public void call(Integer integer) {
+                        System.out.println("parks observable base iteration");
+                    }
+                })
                 .switchMap(new Func1<Integer, Observable<? extends ArrayList<String>>>() {
                     @Override
                     public Observable<? extends ArrayList<String>> call(Integer integer) {
                         if (integer == 1) {
                             ParksStore.initialize(application);
                             return ParksStore.getParkKeys();
-                        }
-                        else {
+                        } else {
                             ParksStore.nuke(application);
                             ParksStore.initialize(application);
                             return sfParksInterface
                                     .getParks()
-                                    .doOnNext(new Action1<ArrayList<JsonObject>>() {
+                                    .doOnNext(new Action1<JsonArray>() {
                                         @Override
-                                        public void call(ArrayList<JsonObject> jsonObjects) {
-                                            ParksStore.updatePaperstore(jsonObjects);
+                                        public void call(JsonArray jsonArray) {
+                                            ParksStore.updatePaperstore(jsonArray);
                                         }
                                     })
-                                    .switchMap(new Func1<ArrayList<JsonObject>, Observable<? extends ArrayList<String>>>() {
+                                    .switchMap(new Func1<JsonArray, Observable<? extends ArrayList<String>>>() {
                                         @Override
-                                        public Observable<? extends ArrayList<String>> call(ArrayList<JsonObject> objects) {
-                                            return ParksStore.getParkKeys();
+                                        public Observable<? extends ArrayList<String>> call(JsonArray objects) {
+                                            return ParksStore.getParkKeys(); // simple index
                                         }
                                     });
                         }
+                    }
+                })
+                .doOnNext(new Action1<ArrayList<String>>() {
+                    @Override
+                    public void call(ArrayList<String> strings) {
+                        System.out.println("got keys");
                     }
                 })
                 .switchMap(new Func1<ArrayList<String>, Observable<? extends List<Park>>>() {
@@ -90,6 +102,7 @@ public class ParksModule {
                                     @Override
                                     public Observable<? extends List<Park>> call(final LatLng latLng) {
                                         final JsonParser jsonParser = new JsonParser();
+                                        System.out.println("got location");
                                         return Observable.from(strings)
                                                 .map(new Func1<String, String>() {
                                                     @Override
@@ -117,15 +130,13 @@ public class ParksModule {
                                                 .filter(new Func1<JsonObject, Boolean>() {
                                                     @Override
                                                     public Boolean call(JsonObject jsonObject) {
-                                                        // its malforming up here in the filters
                                                         return !(jsonObject == null || jsonObject.get(LOCATION_1) == null);
                                                     }
                                                 })
                                                 .filter(new Func1<JsonObject, Boolean>() {
                                                     @Override
                                                     public Boolean call(JsonObject jsonObject) {
-                                                        JsonElement jsonElement = jsonObject.get(LOCATION_1).getAsJsonObject().get(LATITUDE);
-                                                        return !(jsonElement == null || jsonElement.getAsString().equals("999"));
+                                                        return !(jsonObject.get(LOCATION_1).getAsJsonObject().get(LATITUDE) == null);
                                                     }
                                                 })
                                                 .map(new Func1<JsonObject, Park>() {
@@ -134,12 +145,18 @@ public class ParksModule {
                                                         return getParkFromRecord(object, jsonParser, latLng);
                                                     }
                                                 })
-                                                .toSortedList();
+                                                .toSortedList()
+                                                .doOnNext(new Action1<List<Park>>() {
+                                                    @Override
+                                                    public void call(List<Park> parks) {
+                                                        System.out.println("sorted list");
+                                                    }
+                                                });
                                     }
                                 });
                     }
                 })
-                .subscribeOn(Schedulers.newThread());
+                .subscribeOn(backgroundScheduler);
     }
 
     @NonNull
@@ -160,7 +177,9 @@ public class ParksModule {
     }
 
     private static int getDistance(LatLng currentLatLng, float latitude, float longitude) {
-        if (Math.round(currentLatLng.latitude) == 90) {
+        long lat = Math.round(currentLatLng.latitude);
+        // check for either null location latitude
+        if (lat == 90 || lat == 999) {
             Log.w("sfparks parkModule","current location is null!");
             return 0; // user may not have location turned on, or is at the north pole
         }

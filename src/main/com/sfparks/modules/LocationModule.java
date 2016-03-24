@@ -10,7 +10,7 @@ import android.app.Application;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -25,10 +25,13 @@ import dagger.Module;
 import dagger.Provides;
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 @Module
 public class LocationModule {
+
+    private GoogleApiClient.ConnectionCallbacks connectionCallbacks;
 
     enum LocationServiceHealth {
         GOOD,
@@ -54,43 +57,65 @@ public class LocationModule {
             final GoogleApiClient googleApiClient) {
         return Observable
                 .create(new Observable.OnSubscribe<GoogleApiClient>() {
-                    @Override
-                    public void call(final Subscriber<? super GoogleApiClient> subscriber) {
-                        googleApiClient.connect();
-                        GoogleApiClient.ConnectionCallbacks connectionCallbacks = new GoogleApiClient.ConnectionCallbacks() {
                             @Override
-                            public void onConnected(Bundle bundle) { // this is called if already connected
-                                if (subscriber.isUnsubscribed()) {
-                                    googleApiClient.unregisterConnectionCallbacks(this);
-                                } else {
-                                    subscriber.onNext(googleApiClient);
-                                }
-                            }
+                            public void call(final Subscriber<? super GoogleApiClient> subscriber) {
+                                System.out.println("connecting");
+                                googleApiClient.connect();
+                                System.out.println("connected");
+                                // created as field to avoid gc
+                                connectionCallbacks = new GoogleApiClient.ConnectionCallbacks() {
+                                    @Override
+                                    public void onConnected(Bundle bundle) { // this is called if already connected
+                                        if (subscriber.isUnsubscribed()) {
+                                            googleApiClient.unregisterConnectionCallbacks(this);
+                                        } else {
+                                            System.out.println("On Connected");
+                                            Log.d("sfparks locationModule", "got location");
+                                            subscriber.onNext(googleApiClient);
+                                        }
+                                    }
 
-                            @Override
-                            public void onConnectionSuspended(int i) {
-                                // do nothing, connection will retry
+                                    @Override
+                                    public void onConnectionSuspended(int i) {
+                                        // do nothing, connection will retry
+                                    }
+                                };
+                                googleApiClient.registerConnectionCallbacks(connectionCallbacks);
+                                System.out.println("callbacks  registered");
                             }
-                        };
-                        googleApiClient.registerConnectionCallbacks(connectionCallbacks);
-                    }
-                })
+//                            }
+                        }
+                )
                 .first()
+                .doOnNext(new Action1<GoogleApiClient>() {
+                              @Override
+                              public void call(GoogleApiClient googleApiClient) {
+                                  System.out.println("got first");
+                              }
+                          }
+                )
                 .switchMap(new Func1<GoogleApiClient, Observable<? extends LatLng>>() {
                     @Override
-                    public Observable<? extends LatLng> call(final GoogleApiClient googleApiClient) {
+                    public Observable<? extends LatLng> call(
+                            final GoogleApiClient googleApiClient) {
                         return Observable.create(new Observable.OnSubscribe<LatLng>() {
                             @Override
                             public void call(Subscriber<? super LatLng> subscriber) {
                                 if (ContextCompat.checkSelfPermission(application, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                }
-                                Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-                                if (lastLocation == null) {
-                                    Log.d("sfparks location module", "no last location");
-                                    subscriber.onNext(new LatLng(999, 999));
+                                    System.out.println("Didn't have permissions");
+                                    subscriber.onError(new Throwable("Coarse location permissions not granted"));
                                 } else {
-                                    Log.d("sfparks locationModule", "yes last location");
-                                    subscriber.onNext(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()));
+                                    System.out.println("getting last location");
+                                    Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+                                    if (lastLocation == null) {
+                                        System.out.println("null loc");
+                                        Log.d("sfparks location module", "no last location");
+                                        subscriber.onNext(new LatLng(999, 999));
+                                    } else {
+                                        System.out.println("non null loc");
+                                        Log.d("sfparks locationModule", "yes last location");
+                                        subscriber.onNext(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()));
+                                    }
                                 }
                             }
                         });

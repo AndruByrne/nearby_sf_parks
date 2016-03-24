@@ -41,13 +41,14 @@ public class NearbyParksActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("sfparks_onResume", "test_logging");
+        System.out.println("onresumed");
         parksObservable
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<Park>>() {
                     @Override
                     public void call(List<Park> parks) {
                         if(parks.size() != 0){
+                            System.out.println("onNexting");
                             Log.d(
                                     "sfparks onNext: ",
                                     Integer.toString(parks.size()));
