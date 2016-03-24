@@ -59,9 +59,8 @@ public class LocationModule {
                 .create(new Observable.OnSubscribe<GoogleApiClient>() {
                             @Override
                             public void call(final Subscriber<? super GoogleApiClient> subscriber) {
-                                System.out.println("connecting");
                                 googleApiClient.connect();
-                                System.out.println("connected");
+                                System.out.println("requested connection to api client");
                                 // created as field to avoid gc
                                 connectionCallbacks = new GoogleApiClient.ConnectionCallbacks() {
                                     @Override
