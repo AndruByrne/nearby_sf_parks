@@ -56,7 +56,7 @@ public class NearbyParksActivityTest {
 //        MockitoAnnotations.initMocks(this);
 
         // Force Play services success
-        ShadowGooglePlayServicesUtil.setIsGooglePlayServicesAvailable(ConnectionResult.SUCCESS);
+//        ShadowGooglePlayServicesUtil.setIsGooglePlayServicesAvailable(ConnectionResult.SUCCESS);
         System.out.println("set up tests");
     }
 

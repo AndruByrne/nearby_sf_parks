@@ -1,9 +1,13 @@
 package com.sfparks.modules;
 
 import android.app.Application;
+import android.location.Location;
 import android.os.Bundle;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -31,6 +35,7 @@ public class MockLocationModule extends LocationModule {
 
     @Override
     public GoogleApiClient providesAPIClient(Application application) {
+
         Answer<Object> answer = new Answer<Object>() {
             @Override
             public Object answer(final InvocationOnMock invocation) throws Throwable {
@@ -38,11 +43,18 @@ public class MockLocationModule extends LocationModule {
                 return null;
             }
         };
+
         GoogleApiClient mock = Mockito.mock(GoogleApiClient.class);
         doAnswer(answer)
-//        doThrow(new UndeclaredThrowableException(new Throwable("it works!!")))
                 .when(mock).registerConnectionCallbacks(any(GoogleApiClient.ConnectionCallbacks.class));
+
         return mock;
 
+    }
+
+    @Override
+    public FusedLocationProviderApi providesFusedLocationAPI(){
+        FusedLocationProviderApi mock = Mockito.mock(LocationServices.FusedLocationApi.getClass());
+        return mock;
     }
 }

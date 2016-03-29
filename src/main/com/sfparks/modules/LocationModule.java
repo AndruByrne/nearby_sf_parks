@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -52,9 +53,16 @@ public class LocationModule {
 
     @Provides
     @Singleton
+    FusedLocationProviderApi providesFusedLocationAPI(){
+        return LocationServices.FusedLocationApi;
+    }
+
+    @Provides
+    @Singleton
     Observable<LatLng> providesRxLocation(
             final Application application,
-            final GoogleApiClient googleApiClient) {
+            final GoogleApiClient googleApiClient,
+            final FusedLocationProviderApi fusedLocationApi) {
         return Observable
                 .create(new Observable.OnSubscribe<GoogleApiClient>() {
                             @Override
@@ -86,7 +94,7 @@ public class LocationModule {
 //                            }
                         }
                 )
-//                .first()
+                .first()
                 .doOnNext(new Action1<GoogleApiClient>() {
                               @Override
                               public void call(GoogleApiClient googleApiClient) {
@@ -101,12 +109,14 @@ public class LocationModule {
                         return Observable.create(new Observable.OnSubscribe<LatLng>() {
                             @Override
                             public void call(Subscriber<? super LatLng> subscriber) {
-                                if (ContextCompat.checkSelfPermission(application, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                    System.out.println("Didn't have permissions");
-                                    subscriber.onError(new Throwable("Coarse location permissions not granted"));
-                                } else {
+//                                if (ContextCompat.checkSelfPermission(application, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                                    System.out.println("Didn't have permissions");
+//                                    System.out.println("permission is: "+ContextCompat.checkSelfPermission(application, Manifest.permission.ACCESS_COARSE_LOCATION));
+//                                    subscriber.onError(new Throwable("Coarse location permissions not granted"));
+//                                } else {
                                     System.out.println("getting last location");
-                                    Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+                                Location lastLocation = fusedLocationApi.getLastLocation(googleApiClient);
                                     if (lastLocation == null) {
                                         System.out.println("null loc");
                                         Log.d("sfparks location module", "no last location");
@@ -117,7 +127,7 @@ public class LocationModule {
                                         subscriber.onNext(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()));
                                     }
                                 }
-                            }
+//                            }
                         });
                     }
                 });
