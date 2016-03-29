@@ -1,6 +1,9 @@
 package com.sfparks.modules;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
+import com.sfparks.test_utils.StringConst;
 
 import org.mockito.Mockito;
 
@@ -14,11 +17,7 @@ public class MockNetworkModule extends NetworkModule {
 
     public MockNetworkModule(String baseUrl) { super(baseUrl); }
 
-    public void setResponse(JsonArray response) {
-        this.response = response;
-    }
-
-    JsonArray response;
+    JsonArray response = (new JsonParser().parse(new Gson().toJson(StringConst.SFAPI_LIST)).getAsJsonArray());
 
     @Override
     NetworkModule.SFParksInterface providesSFPI(Retrofit retrofit) {

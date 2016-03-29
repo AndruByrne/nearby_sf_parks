@@ -2,6 +2,7 @@ package com.sfparks.activity;
 
 import android.app.Application;
 import android.os.Bundle;
+import android.provider.Settings;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -23,16 +24,21 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.cglib.proxy.UndeclaredThrowableException;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.gms.ShadowGooglePlayServicesUtil;
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 import io.paperdb.Paper;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 
@@ -45,18 +51,12 @@ public class NearbyParksActivityTest {
     private GoogleApiClient gAPImock;
 
     @Before
-    public void setUp() throws Exception{
-        JsonParser jsonParser = new JsonParser();
-        Gson gson = new Gson();
-        // Force Play services success
-        Application application = RuntimeEnvironment.application;
-        MockNetworkModule mockNetworkModule = new MockNetworkModule("");
+    public void setUp() throws Exception {
+
 //        MockitoAnnotations.initMocks(this);
-//        ShadowGooglePlayServicesUtil.setIsGooglePlayServicesAvailable(ConnectionResult.SUCCESS);
-        mockNetworkModule.setResponse(jsonParser.parse(gson.toJson(StringConst.SFAPI_LIST)).getAsJsonArray()); // unchecked assignment OK
-        ((TestNearbyParksApplication) application).setMockNetworkModule(mockNetworkModule);
-        gAPImock = Mockito.mock(GoogleApiClient.class);
-        ((TestNearbyParksApplication) application).setMockLocationModule(new MockLocationModule(gAPImock));
+
+        // Force Play services success
+        ShadowGooglePlayServicesUtil.setIsGooglePlayServicesAvailable(ConnectionResult.SUCCESS);
         System.out.println("set up tests");
     }
 
@@ -65,10 +65,6 @@ public class NearbyParksActivityTest {
         System.out.println("setting activity");
         NearbyParksActivity activity = Robolectric.setupActivity(NearbyParksActivity.class);
         System.out.println("activity set");
-        ArgumentCaptor<GoogleApiClient.ConnectionCallbacks> callbacksCaptor = ArgumentCaptor.forClass(GoogleApiClient.ConnectionCallbacks.class);
-        Mockito.verify(gAPImock).registerConnectionCallbacks(callbacksCaptor.capture());
-        System.out.println("callback registered");
-        callbacksCaptor.getValue().onConnected(new Bundle());
         assertTrue(activity != null);
 
 //        Robolectric.flushBackgroundThreadScheduler();

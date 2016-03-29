@@ -17,27 +17,14 @@ import com.sfparks.modules.ThreadingModule;
 
 public class TestNearbyParksApplication extends NearbyParksApplication {
 
-    MockNetworkModule mockNetworkModule;
-    MockLocationModule mockLocationModule;
-
     @Override
     public NetworkModule getNetworkModule(String apiBaseUrl) {
-        if (mockNetworkModule == null){ return super.getNetworkModule(apiBaseUrl); }
-        return mockNetworkModule;
-    }
-
-    public void setMockNetworkModule(MockNetworkModule mockNetworkModule) {
-        this.mockNetworkModule = mockNetworkModule;
+        return new MockNetworkModule(apiBaseUrl);
     }
 
     @Override
     public LocationModule getLocationModule(){
-        if (mockLocationModule == null){ return super.getLocationModule(); }
-        return mockLocationModule;
-    }
-
-    public void setMockLocationModule(MockLocationModule mockLocationModule){
-        this.mockLocationModule = mockLocationModule;
+        return new MockLocationModule();
     }
 
     @Override

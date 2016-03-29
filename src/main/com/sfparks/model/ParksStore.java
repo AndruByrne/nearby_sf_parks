@@ -20,12 +20,10 @@ public class ParksStore {
     }
 
     static public void updatePaperstore(JsonArray updates) {
-        String holderString;
         int updatesLength = updates.size();
         int i;
         for (i = 0; i < updatesLength; i++) {
-            holderString = updates.get(i).toString();
-            Paper.book().write(Integer.toString(i), holderString);
+            Paper.book().write(Integer.toString(i), updates.get(i).toString());
         }
     }
 

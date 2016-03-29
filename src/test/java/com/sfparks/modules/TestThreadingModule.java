@@ -12,7 +12,6 @@ import rx.schedulers.Schedulers;
 public class TestThreadingModule extends ThreadingModule {
     @Override
     public Scheduler providesScheduler(){
-        System.out.println("providing test threading module");
         return AndroidSchedulers.mainThread();
     }
 }

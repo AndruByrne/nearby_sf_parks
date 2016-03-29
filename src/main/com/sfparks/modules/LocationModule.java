@@ -66,6 +66,7 @@ public class LocationModule {
                                     @Override
                                     public void onConnected(Bundle bundle) { // this is called if already connected
                                         if (subscriber.isUnsubscribed()) {
+                                            System.out.println("unsubscribed");
                                             googleApiClient.unregisterConnectionCallbacks(this);
                                         } else {
                                             System.out.println("On Connected");
@@ -85,7 +86,7 @@ public class LocationModule {
 //                            }
                         }
                 )
-                .first()
+//                .first()
                 .doOnNext(new Action1<GoogleApiClient>() {
                               @Override
                               public void call(GoogleApiClient googleApiClient) {
