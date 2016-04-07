@@ -35,7 +35,8 @@ public class ParkListHandlers {
         ViewDataBinding popupBinding = DataBindingUtil.bind(popupView);
         popupBinding.setVariable(BR.park, park);
         popupWindow.setContentView(popupView);
-        popupWindow.showAsDropDown(view, 0, 0);
+        popupWindow.showAtLocation((View)view.getParent(), Gravity.NO_GRAVITY, 100, 500);
+//        popupWindow.showAsDropDown((View)view.getParent(), 100, 0);
 //        ViewDataBinding viewDataBinding = DataBindingUtil.setContentView(popupWindow, R.layout.park_popup);
 //        view.getParent().
     }
