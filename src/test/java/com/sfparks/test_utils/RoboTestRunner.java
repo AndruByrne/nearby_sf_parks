@@ -4,7 +4,7 @@ package com.sfparks.test_utils;
  * Created by Andrew Brin on 3/22/2016.
  */
 
-import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.res.FileFsFile;
 import org.robolectric.annotation.Config;
 import org.robolectric.manifest.AndroidManifest;
@@ -20,7 +20,7 @@ import org.robolectric.util.ReflectionHelpers;
  * This test runner requires that you set the 'constants' field on the @Config
  * annotation (or the org.robolectric.Config.properties file) for your tests.
  */
-public class RoboTestRunner extends RobolectricTestRunner {
+public class RoboTestRunner extends RobolectricGradleTestRunner {
     private static final String BUILD_OUTPUT = "build/intermediates";
 
     public RoboTestRunner(Class<?> klass) throws InitializationError {

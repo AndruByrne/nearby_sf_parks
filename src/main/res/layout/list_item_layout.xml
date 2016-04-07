@@ -4,12 +4,16 @@
         <variable
             name="park"
             type="com.sfparks.model.Park"/>
+        <variable
+            name="park_list_handlers"
+            type="com.sfparks.activity.ParkListHandlers"/>
 
     </data>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:onClick="@{park_list_handlers.onParkItemClick}">
         <TextView
             android:id="@+id/distance"
             android:layout_width="0dp"

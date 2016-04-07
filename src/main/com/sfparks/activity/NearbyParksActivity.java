@@ -34,7 +34,8 @@ public class NearbyParksActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ParksListActivityBinding parksListActivityBinding = DataBindingUtil.setContentView(this, R.layout.parks_list_activity);
-        parksListActivityBinding.setVariable(BR.park_list, observableArrayList);
+//        parksListActivityBinding.setVariable(BR.park_list, observableArrayList);
+        parksListActivityBinding.setParkList(observableArrayList);
         ((NearbyParksApplication) getApplication()).getParksComponent().inject(this);
     }
 

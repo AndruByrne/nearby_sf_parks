@@ -1,14 +1,11 @@
 package com.sfparks.activity;
 
-import android.app.Application;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 import android.databinding.ViewDataBinding;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +23,6 @@ import javax.inject.Inject;
  */
 public class BindableRecyclerAdapter extends RecyclerView.Adapter<BindableRecyclerAdapter.BindingHolder> {
 
-    @Inject Application application;
     private List<Park> parks;
     private static ObservableList.OnListChangedCallback onListChangedCallback;
 
@@ -69,6 +65,7 @@ public class BindableRecyclerAdapter extends RecyclerView.Adapter<BindableRecycl
     }
 
     public static class BindingHolder extends RecyclerView.ViewHolder {
+
         private ViewDataBinding dataBinding;
 
         public BindingHolder(View rowView) {
@@ -90,7 +87,9 @@ public class BindableRecyclerAdapter extends RecyclerView.Adapter<BindableRecycl
     @Override
     public void onBindViewHolder(BindingHolder holder, int position) {
         final Park park = parks.get(position);
+        final ParkListHandlers parkListHandlers = new ParkListHandlers(park);
         holder.getDataBinding().setVariable(BR.park, park);
+        holder.getDataBinding().setVariable(BR.park_list_handlers, parkListHandlers);
         holder.getDataBinding().executePendingBindings();
     }
 
@@ -98,4 +97,5 @@ public class BindableRecyclerAdapter extends RecyclerView.Adapter<BindableRecycl
     public int getItemCount() {
         return parks.size();
     }
+
 }

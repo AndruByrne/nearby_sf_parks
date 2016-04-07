@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="manager_label">Manager:</string>
+    <string name="park_email_label">Park Email:</string>
+    <string name="park_phone_label">Park Phone:</string>
+</resources>
