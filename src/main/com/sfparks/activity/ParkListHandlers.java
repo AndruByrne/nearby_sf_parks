@@ -14,8 +14,6 @@ import com.sfparks.NearbyParksApplication;
 import com.sfparks.R;
 import com.sfparks.model.Park;
 
-import javax.inject.Inject;
-
 /*
  * Created by Andrew Brin on 4/6/2016.
  */

@@ -3,24 +3,19 @@ package com.sfparks.activity;
 import android.app.Activity;
 import android.databinding.DataBindingUtil;
 import android.databinding.ObservableArrayList;
-import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.PopupWindow;
 
-import com.sfparks.BR;
 import com.sfparks.NearbyParksApplication;
 import com.sfparks.R;
-import com.sfparks.databinding.ListItemLayoutBinding;
 import com.sfparks.databinding.ParksListActivityBinding;
 import com.sfparks.model.Park;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
-import io.paperdb.Paper;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
@@ -45,7 +40,6 @@ public class NearbyParksActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("popupwindow is null? : " + Boolean.toString(popupWindow == null));
         parksObservable
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<Park>>() {
@@ -72,7 +66,6 @@ public class NearbyParksActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        PopupWindow popupWindow = ((NearbyParksApplication) this.getApplication()).getParksComponent().popupWindow();
         if (popupWindow.isShowing()) {
             popupWindow.dismiss();
         } else {

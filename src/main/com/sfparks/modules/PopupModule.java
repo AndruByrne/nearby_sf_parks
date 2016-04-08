@@ -1,7 +1,6 @@
 package com.sfparks.modules;
 
 import android.app.Application;
-import android.util.Log;
 import android.widget.PopupWindow;
 
 import javax.inject.Singleton;

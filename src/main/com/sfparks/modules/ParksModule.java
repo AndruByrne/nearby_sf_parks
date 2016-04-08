@@ -7,12 +7,11 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import com.sfparks.model.ParksStore;
 import com.sfparks.model.Park;
+import com.sfparks.model.ParksStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,10 @@ import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
-import static java.lang.Math.*;
+import static java.lang.Math.PI;
+import static java.lang.Math.acos;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 /*
  * Created by Andrew Brin on 3/1/2016.

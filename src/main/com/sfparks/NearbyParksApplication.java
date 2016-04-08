@@ -1,7 +1,6 @@
 package com.sfparks;
 
 import android.app.Application;
-import android.support.annotation.NonNull;
 
 import com.sfparks.modules.AppModule;
 import com.sfparks.modules.DaggerParksComponent;

@@ -5,13 +5,9 @@ package com.sfparks.modules;
  */
 
 
-import android.Manifest;
 import android.app.Application;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -26,7 +22,6 @@ import dagger.Module;
 import dagger.Provides;
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
 @Module
