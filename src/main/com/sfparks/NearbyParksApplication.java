@@ -9,6 +9,7 @@ import com.sfparks.modules.LocationModule;
 import com.sfparks.modules.NetworkModule;
 import com.sfparks.modules.ParksComponent;
 import com.sfparks.modules.ParksModule;
+import com.sfparks.modules.PopupModule;
 import com.sfparks.modules.ThreadingModule;
 
 
@@ -25,6 +26,7 @@ public class NearbyParksApplication extends Application {
                 .networkModule(getNetworkModule(SF_CITY_API_BASE_URL))
                 .locationModule(getLocationModule())
                 .parksModule(new ParksModule())
+                .popupModule(new PopupModule())
                 .threadingModule(getThreadingModule())
                 .build();
     }

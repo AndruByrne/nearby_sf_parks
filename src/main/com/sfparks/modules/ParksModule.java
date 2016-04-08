@@ -59,7 +59,6 @@ public class ParksModule {
                 .doOnNext(new Action1<Integer>() {
                     @Override
                     public void call(Integer integer) {
-                        System.out.println("parks observable base iteration");
                     }
                 })
                 .switchMap(new Func1<Integer, Observable<? extends ArrayList<String>>>() {
@@ -86,12 +85,6 @@ public class ParksModule {
                                         }
                                     });
                         }
-                    }
-                })
-                .doOnNext(new Action1<ArrayList<String>>() {
-                    @Override
-                    public void call(ArrayList<String> strings) {
-                        System.out.println("got keys");
                     }
                 })
                 .switchMap(new Func1<ArrayList<String>, Observable<? extends List<Park>>>() {
@@ -145,13 +138,7 @@ public class ParksModule {
                                                         return getParkFromRecord(object, jsonParser, latLng);
                                                     }
                                                 })
-                                                .toSortedList()
-                                                .doOnNext(new Action1<List<Park>>() {
-                                                    @Override
-                                                    public void call(List<Park> parks) {
-                                                        System.out.println("sorted list");
-                                                    }
-                                                });
+                                                .toSortedList();
                                     }
                                 });
                     }

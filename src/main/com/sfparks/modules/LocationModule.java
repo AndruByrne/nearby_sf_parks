@@ -60,7 +60,6 @@ public class LocationModule {
     @Provides
     @Singleton
     Observable<LatLng> providesRxLocation(
-            final Application application,
             final GoogleApiClient googleApiClient,
             final FusedLocationProviderApi fusedLocationApi) {
         return Observable
@@ -74,10 +73,8 @@ public class LocationModule {
                                     @Override
                                     public void onConnected(Bundle bundle) { // this is called if already connected
                                         if (subscriber.isUnsubscribed()) {
-                                            System.out.println("unsubscribed");
                                             googleApiClient.unregisterConnectionCallbacks(this);
                                         } else {
-                                            System.out.println("On Connected");
                                             Log.d("sfparks locationModule", "got location");
                                             subscriber.onNext(googleApiClient);
                                         }
@@ -89,19 +86,11 @@ public class LocationModule {
                                     }
                                 };
                                 googleApiClient.registerConnectionCallbacks(connectionCallbacks);
-                                System.out.println("callbacks  registered");
                             }
 //                            }
                         }
                 )
                 .first()
-                .doOnNext(new Action1<GoogleApiClient>() {
-                              @Override
-                              public void call(GoogleApiClient googleApiClient) {
-                                  System.out.println("got first");
-                              }
-                          }
-                )
                 .switchMap(new Func1<GoogleApiClient, Observable<? extends LatLng>>() {
                     @Override
                     public Observable<? extends LatLng> call(
@@ -119,11 +108,9 @@ public class LocationModule {
                                 Location lastLocation = fusedLocationApi.getLastLocation(googleApiClient);
                                     if (lastLocation == null) {
                                         System.out.println("null loc");
-                                        Log.d("sfparks location module", "no last location");
                                         subscriber.onNext(new LatLng(999, 999));
                                     } else {
                                         System.out.println("non null loc");
-                                        Log.d("sfparks locationModule", "yes last location");
                                         subscriber.onNext(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()));
                                     }
                                 }

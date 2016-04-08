@@ -11,6 +11,7 @@
         android:name=".NearbyParksApplication">
         <activity
             android:name=".activity.NearbyParksActivity"
+            android:label="Parks in San Francisco"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

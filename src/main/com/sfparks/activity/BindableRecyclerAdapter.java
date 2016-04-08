@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupWindow;
 
 import com.sfparks.BR;
 import com.sfparks.R;
@@ -22,6 +23,8 @@ import javax.inject.Inject;
  * Created by Andrew Brin on 3/8/2016.
  */
 public class BindableRecyclerAdapter extends RecyclerView.Adapter<BindableRecyclerAdapter.BindingHolder> {
+
+    @Inject PopupWindow popupWindow;
 
     private List<Park> parks;
     private static ObservableList.OnListChangedCallback onListChangedCallback;

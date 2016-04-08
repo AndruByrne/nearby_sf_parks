@@ -6,6 +6,7 @@ import android.databinding.ObservableArrayList;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.PopupWindow;
 
 import com.sfparks.BR;
 import com.sfparks.NearbyParksApplication;
@@ -28,13 +29,15 @@ import rx.functions.Action1;
 public class NearbyParksActivity extends Activity {
 
     private final ObservableArrayList<Park> observableArrayList = new ObservableArrayList<>();
-    @Inject Observable<List<Park>> parksObservable;
+    @Inject
+    Observable<List<Park>> parksObservable;
+    @Inject
+    PopupWindow popupWindow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ParksListActivityBinding parksListActivityBinding = DataBindingUtil.setContentView(this, R.layout.parks_list_activity);
-//        parksListActivityBinding.setVariable(BR.park_list, observableArrayList);
         parksListActivityBinding.setParkList(observableArrayList);
         ((NearbyParksApplication) getApplication()).getParksComponent().inject(this);
     }
@@ -42,17 +45,13 @@ public class NearbyParksActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("onresumed");
+        System.out.println("popupwindow is null? : " + Boolean.toString(popupWindow == null));
         parksObservable
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<Park>>() {
                     @Override
                     public void call(List<Park> parks) {
-                        if(parks.size() != 0){
-                            System.out.println("onNexting");
-                            Log.d(
-                                    "sfparks onNext: ",
-                                    Integer.toString(parks.size()));
+                        if (parks.size() != 0) {
                             if (observableArrayList.size() == 0) observableArrayList.addAll(parks);
                         } else Log.i("com.sfparks", "empty parks list not displayed");
                     }
@@ -69,5 +68,15 @@ public class NearbyParksActivity extends Activity {
                         //unsubscribe
                     }
                 });
+    }
+
+    @Override
+    public void onBackPressed() {
+        PopupWindow popupWindow = ((NearbyParksApplication) this.getApplication()).getParksComponent().popupWindow();
+        if (popupWindow.isShowing()) {
+            popupWindow.dismiss();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

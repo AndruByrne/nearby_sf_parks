@@ -3,6 +3,9 @@
 
     <data>
         <variable
+            name="park_list_handlers"
+            type="com.sfparks.activity.ParkListHandlers"/>
+        <variable
             name="park"
             type="com.sfparks.model.Park"/>
     </data>
@@ -10,7 +13,9 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="#660000CC"
+        >
 
         <TextView
             android:layout_width="match_parent"
@@ -21,11 +26,18 @@
             android:textAlignment="center"
             android:textIsSelectable="true"
             android:typeface="serif"
-            android:textSize="48dp" />
+            android:textSize="48dp"
+            android:focusable="true"
+            android:clickable="true"
+            android:onClick="@{park_list_handlers.onPopupClicked}"
+            />
 
         <TableLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="40dp">
 
             <TableRow
                 android:layout_width="match_parent"
