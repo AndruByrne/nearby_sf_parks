@@ -97,7 +97,6 @@ public class ParksModule {
                                     @Override
                                     public Observable<? extends List<Park>> call(final LatLng latLng) {
                                         final JsonParser jsonParser = new JsonParser();
-                                        System.out.println("got location");
                                         return Observable.from(strings)
                                                 .map(new Func1<String, String>() {
                                                     @Override

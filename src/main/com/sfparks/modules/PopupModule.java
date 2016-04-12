@@ -14,13 +14,11 @@ import dagger.Provides;
 @Module
 public class PopupModule {
     public PopupModule(){
-        System.out.println("made a popupmodule");
     }
 
     @Provides
     @Singleton
     PopupWindow providesPopupWindow(Application application){
-        System.out.println("making new popupwindow");
         return new PopupWindow(application);
     }
 

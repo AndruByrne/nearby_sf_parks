@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.sfparks.BR;
 import com.sfparks.R;
@@ -22,17 +23,23 @@ import javax.inject.Inject;
 /*
  * Created by Andrew Brin on 3/8/2016.
  */
-public class BindableRecyclerAdapter extends RecyclerView.Adapter<BindableRecyclerAdapter.BindingHolder> {
+public class BindableRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    @Inject PopupWindow popupWindow;
+    @Inject
+    PopupWindow popupWindow;
 
-    private List<Park> parks;
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ITEM = 1;
+
     private static ObservableList.OnListChangedCallback onListChangedCallback;
+    private List<Park> parks;
 
-    public BindableRecyclerAdapter(ObservableArrayList<Park> parks){ this.parks = parks; }
+    public BindableRecyclerAdapter(ObservableArrayList<Park> parks) {
+        this.parks = parks;
+    }
 
     @BindingAdapter({"entries"})
-    public static void setEntries(RecyclerView view, final ObservableArrayList<Park> parks){
+    public static void setEntries(RecyclerView view, final ObservableArrayList<Park> parks) {
         final BindableRecyclerAdapter adapter = new BindableRecyclerAdapter(parks);
         // making field to avoid gc
         onListChangedCallback = new ObservableList.OnListChangedCallback() {
@@ -81,24 +88,49 @@ public class BindableRecyclerAdapter extends RecyclerView.Adapter<BindableRecycl
         }
     }
 
-    @Override
-    public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_layout, parent, false);
-        return new BindingHolder(view);
+    public static class HeaderHolder extends RecyclerView.ViewHolder {
+
+        public HeaderHolder(View itemView) {
+            super(itemView);
+        }
     }
 
     @Override
-    public void onBindViewHolder(BindingHolder holder, int position) {
-        final Park park = parks.get(position);
-        final ParkListHandlers parkListHandlers = new ParkListHandlers(park);
-        holder.getDataBinding().setVariable(BR.park, park);
-        holder.getDataBinding().setVariable(BR.park_list_handlers, parkListHandlers);
-        holder.getDataBinding().executePendingBindings();
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == TYPE_HEADER) {
+            final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_header, parent, false);
+            return new HeaderHolder(view);
+        } else if (viewType == TYPE_ITEM) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_layout, parent, false);
+            return new BindingHolder(view);
+        }
+        throw new RuntimeException("There is no type to match " + viewType);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return isPositionZero(position) ? TYPE_HEADER : TYPE_ITEM;
+    }
+
+    private boolean isPositionZero(int position) {
+        return position == 0;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof BindingHolder) {
+            BindingHolder bindingHolder = (BindingHolder) holder;
+            final Park park = parks.get(position);
+            final ParkListHandlers parkListHandlers = new ParkListHandlers(park);
+            bindingHolder.getDataBinding().setVariable(BR.park, park);
+            bindingHolder.getDataBinding().setVariable(BR.park_list_handlers, parkListHandlers);
+            bindingHolder.getDataBinding().executePendingBindings();
+        }
     }
 
     @Override
     public int getItemCount() {
-        return parks.size();
+        return parks.size() + 1;
     }
 
 }
